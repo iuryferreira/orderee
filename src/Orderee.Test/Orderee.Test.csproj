@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Orderee.Core\Orderee.Core.csproj" />
+  </ItemGroup>
+
 </Project>
