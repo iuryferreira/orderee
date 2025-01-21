@@ -1,0 +1,119 @@
+services:
+  # SQL Server
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Azure Cosmos DB Emulator
+  cosmosdb:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+    container_name: cosmosdb
+    environment:
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
+      AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE: "0.0.0.0"
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+    ports:
+      - "1234:1234"    # Acesso ao Data Explorer via https://localhost:1234/_explorer/index.html
+      - "8081:8081"  # Porta interna do gateway
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://cosmosdb:1234/_explorer/emulator.pem || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - "5672:5672"    # Porta de mensagens
+      - "15672:15672"  # Management UI do RabbitMQ
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # UI para o Redis (Redis Commander)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    depends_on:
+      - redis
+    environment:
+      # Variável que indica onde está o Redis
+      REDIS_HOSTS: "local:redis:6379"
+    ports:
+      - "8082:8081"  # A UI estará disponível em http://localhost:8082
+
+  # Seq
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    ports:
+      - "5341:80"
+    environment:
+      ACCEPT_EULA: "Y"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://seq:80/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Aplicação .NET (exemplo)
+  app:
+    build:
+      dockerfile: Dockerfile
+    container_name: app
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=AppDb;User=sa;Password=YourStrong!Passw0rd;"
+      ConnectionStrings__CosmosDb: "AccountEndpoint=https://cosmosdb:8081;AccountKey=YourEmulatorKey;"
+      RabbitMq__Host: "rabbitmq"
+      Redis__Connection: "redis:6379"
+      Serilog__Seq: "http://seq:80"
+    depends_on:
+      - sqlserver
+      - cosmosdb
+      - rabbitmq
+      - redis
+      - seq
+    ports:
+      - "5000:8080"  # Mapeia porta 8000 do host para 5000 do contêiner
+      # Se precisar expor HTTPS (caso sua app .NET use 5001 para HTTPS), ative a linha abaixo:
+      # - "8001:5001" 
+    # Se quiser montar volume ou utilizar algum profile adicional, adicionar aqui.
+
+volumes:
+  sql_data:
+  redis_data:
