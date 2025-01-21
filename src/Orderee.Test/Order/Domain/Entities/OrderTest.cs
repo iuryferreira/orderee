@@ -1,5 +1,5 @@
-﻿using Orderee.Core.Oder.Domain.Entities;
-using Orderee.Core.Oder.Domain.Events;
+﻿using Orderee.Core.Order.Domain.Entities;
+using Orderee.Core.Order.Domain.Events;
 
 namespace Orderee.Test.Order.Domain.Entities;
 
@@ -9,7 +9,7 @@ public class OrderTest
     public void AddItem_ShouldAddValidItem_WhenItemDoesNotExist()
     {
         // Arrange
-        var order = Core.Oder.Domain.Entities.Order.Create();
+        var order = Core.Order.Domain.Entities.Order.Create();
         var validItem = new OrderItem
         {
             ProductId = Guid.NewGuid(),
@@ -31,7 +31,7 @@ public class OrderTest
     public void AddItem_ShouldThrowException_WhenItemIsInvalid()
     {
         // Arrange
-        var order = Core.Oder.Domain.Entities.Order.Create();
+        var order = Core.Order.Domain.Entities.Order.Create();
         var invalidItem = new OrderItem
         {
             ProductId = Guid.Empty,
@@ -50,7 +50,7 @@ public class OrderTest
     public void AddItem_ShouldThrowException_WhenItemAlreadyExists()
     {
         // Arrange
-        var order = Core.Oder.Domain.Entities.Order.Create();
+        var order = Core.Order.Domain.Entities.Order.Create();
         var item = new OrderItem
         {
             ProductId = Guid.NewGuid(),
@@ -73,7 +73,7 @@ public class OrderTest
     public void Create_ShouldAddOrderCreatedEvent_WhenCalled()
     {
         // Arrange & Act
-        var order = Core.Oder.Domain.Entities.Order.Create();
+        var order = Core.Order.Domain.Entities.Order.Create();
 
         // Assert
         Assert.IsType<OrderCreatedEvent>(order.DomainEvents.First());
@@ -83,7 +83,7 @@ public class OrderTest
     public void Create_ShouldGenerateNewOrder_WhenCalled()
     {
         // Act
-        var order = Core.Oder.Domain.Entities.Order.Create();
+        var order = Core.Order.Domain.Entities.Order.Create();
 
         // Assert
 

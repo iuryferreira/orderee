@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Orderee.Core.Oder.Domain.Entities;
+namespace Orderee.Core.Order.Domain.Entities;
 
 class OrderItem
 {

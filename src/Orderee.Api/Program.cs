@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Orderee.Api;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -27,9 +28,12 @@ todosApi.MapGet("/{id:int}", (int id) =>
 
 app.Run();
 
-public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
-
-[JsonSerializable(typeof(Todo[]))]
-internal partial class AppJsonSerializerContext : JsonSerializerContext
+namespace Orderee.Api
 {
+    public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
+
+    [JsonSerializable(typeof(Todo[]))]
+    internal partial class AppJsonSerializerContext : JsonSerializerContext
+    {
+    }
 }

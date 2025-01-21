@@ -1,8 +1,8 @@
 using JetBrains.Annotations;
-using Orderee.Core.Oder.Domain.Events;
+using Orderee.Core.Order.Domain.Events;
 using Orderee.Core.Shared;
 
-namespace Orderee.Core.Oder.Domain.Entities;
+namespace Orderee.Core.Order.Domain.Entities;
 
 class Order : AggregateRoot<Order>
 {

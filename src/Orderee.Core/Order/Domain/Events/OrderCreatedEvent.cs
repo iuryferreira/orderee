@@ -1,12 +1,11 @@
-using Orderee.Core.Oder.Domain.Entities;
 using Orderee.Core.Shared;
 
-namespace Orderee.Core.Oder.Domain.Events;
+namespace Orderee.Core.Order.Domain.Events;
 
-class OrderCreatedEvent : IDomainEvent, IAggregateEvent<Order>
+class OrderCreatedEvent : IDomainEvent, IAggregateEvent<Entities.Order>
 {
     
-    public void Apply(Order aggregate)
+    public void Apply(Entities.Order aggregate)
     {
         AggregateId = aggregate.Id;
     }
